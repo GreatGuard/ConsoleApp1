@@ -45,14 +45,35 @@ namespace ConsoleApp1
             //Debug.Assert(foobar.Foo is Foo);
             //Debug.Assert(foobar.Bar is Bar);
 
-            var services = new Cat()
-                .Register<Base, Foo>(Lifetime.Transisent)
-                .Register<Base, Bar>(Lifetime.Transisent)
-                .Register<Base, Baz>(Lifetime.Transisent)
-                .GetServices<Base>();
-            Debug.Assert(services.OfType<Foo>().Any());
-            Debug.Assert(services.OfType<Bar>().Any());
-            Debug.Assert(services.OfType<Baz>().Any());
+            //var services = new Cat()
+            //    .Register<Base, Foo>(Lifetime.Transisent)
+            //    .Register<Base, Bar>(Lifetime.Transisent)
+            //    .Register<Base, Baz>(Lifetime.Transisent)
+            //    .GetServices<Base>();
+            //Debug.Assert(services.OfType<Foo>().Any());
+            //Debug.Assert(services.OfType<Bar>().Any());
+            //Debug.Assert(services.OfType<Baz>().Any());
+
+            using (
+                var root = new Cat()
+                .Register<IFoo, Foo>(Lifetime.Transisent)
+                .Register<IBar>(_ => new Bar(), Lifetime.Self)
+                .Register<IBaz, Baz>(Lifetime.Root)
+                .Register(Assembly.GetEntryAssembly())
+                )
+            {
+                using (
+                    var cat = root.CreateChild()
+                    )
+                {
+                    cat.GetService<IFoo>();
+                    cat.GetService<IBar>();
+                    cat.GetService<IBaz>();
+                    cat.GetService<IQux>();
+                    Console.WriteLine($"Child cat is disposed.");
+                }
+                Console.WriteLine($"Root cat is disposed.");
+            }
         }
     }
 
