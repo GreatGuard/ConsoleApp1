@@ -37,13 +37,22 @@ namespace ConsoleApp1
             //GetServices<IBaz>(cat2);
             //GetServices<IQux>(cat2);
 
-            var cat = new Cat()
-                .Register<IFoo, Foo>(Lifetime.Transisent)
-                .Register<IBar, Bar>(Lifetime.Transisent)
-                .Register(typeof(IFoobar<,>), typeof(Foobar<,>), Lifetime.Transisent);
-            var foobar = (Foobar<IFoo, IBar>)cat.GetService<IFoobar<IFoo, IBar>>();
-            Debug.Assert(foobar.Foo is Foo);
-            Debug.Assert(foobar.Bar is Bar);
+            //var cat = new Cat()
+            //    .Register<IFoo, Foo>(Lifetime.Transisent)
+            //    .Register<IBar, Bar>(Lifetime.Transisent)
+            //    .Register(typeof(IFoobar<,>), typeof(Foobar<,>), Lifetime.Transisent);
+            //var foobar = (Foobar<IFoo, IBar>)cat.GetService<IFoobar<IFoo, IBar>>();
+            //Debug.Assert(foobar.Foo is Foo);
+            //Debug.Assert(foobar.Bar is Bar);
+
+            var services = new Cat()
+                .Register<Base, Foo>(Lifetime.Transisent)
+                .Register<Base, Bar>(Lifetime.Transisent)
+                .Register<Base, Baz>(Lifetime.Transisent)
+                .GetServices<Base>();
+            Debug.Assert(services.OfType<Foo>().Any());
+            Debug.Assert(services.OfType<Bar>().Any());
+            Debug.Assert(services.OfType<Baz>().Any());
         }
     }
 
