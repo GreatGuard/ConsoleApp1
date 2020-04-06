@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -14,27 +15,35 @@ namespace ConsoleApp1
             //Console.WriteLine(typeof(string).Assembly.FullName);
             //Console.WriteLine(typeof(bool).Assembly.FullName);
             //Console.WriteLine("Hello World!");
-            var root = new Cat()
+            //var root = new Cat()
+            //    .Register<IFoo, Foo>(Lifetime.Transisent)
+            //    .Register<IBar>(_ => new Bar(), Lifetime.Self)
+            //    .Register<IBaz, Baz>(Lifetime.Root)
+            //    .Register(Assembly.GetEntryAssembly());
+            //var cat1 = root.CreateChild();
+            //var cat2 = root.CreateChild();
+            //void GetServices<TService>(Cat cat)
+            //{
+            //    cat.GetService<TService>();
+            //    cat.GetService<TService>();
+            //}
+            //GetServices<IFoo>(cat1);
+            //GetServices<IBar>(cat1);
+            //GetServices<IBaz>(cat1);
+            //GetServices<IQux>(cat1);
+            //Console.WriteLine();
+            //GetServices<IFoo>(cat2);
+            //GetServices<IBar>(cat2);
+            //GetServices<IBaz>(cat2);
+            //GetServices<IQux>(cat2);
+
+            var cat = new Cat()
                 .Register<IFoo, Foo>(Lifetime.Transisent)
-                .Register<IBar>(_ => new Bar(), Lifetime.Self)
-                .Register<IBaz, Baz>(Lifetime.Root)
-                .Register(Assembly.GetEntryAssembly());
-            var cat1 = root.CreateChild();
-            var cat2 = root.CreateChild();
-            void GetServices<TService>(Cat cat)
-            {
-                cat.GetService<TService>();
-                cat.GetService<TService>();
-            }
-            GetServices<IFoo>(cat1);
-            GetServices<IBar>(cat1);
-            GetServices<IBaz>(cat1);
-            GetServices<IQux>(cat1);
-            Console.WriteLine();
-            GetServices<IFoo>(cat2);
-            GetServices<IBar>(cat2);
-            GetServices<IBaz>(cat2);
-            GetServices<IQux>(cat2);
+                .Register<IBar, Bar>(Lifetime.Transisent)
+                .Register(typeof(IFoobar<,>), typeof(Foobar<,>), Lifetime.Transisent);
+            var foobar = (Foobar<IFoo, IBar>)cat.GetService<IFoobar<IFoo, IBar>>();
+            Debug.Assert(foobar.Foo is Foo);
+            Debug.Assert(foobar.Bar is Bar);
         }
     }
 
